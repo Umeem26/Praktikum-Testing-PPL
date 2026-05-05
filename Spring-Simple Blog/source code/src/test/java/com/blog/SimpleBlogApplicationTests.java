@@ -1,0 +1,14 @@
+package com.blog;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+public class SimpleBlogApplicationTests {
+
+    @Test
+    public void contextLoads() {
+        // Ini adalah test bawaan untuk memastikan konfigurasi Spring Boot aman
+    }
+
+}
