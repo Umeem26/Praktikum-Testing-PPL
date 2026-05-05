@@ -94,14 +94,16 @@ public class CommentControllerTest {
 
     @Test
     public void testSaveCommentFailIntegration() throws Exception {
-        // Skenario 6: Gagal menyimpan komentar (Memancing Error 500)
-        Comment newComment = new Comment(); // Data kosong
-        when(commentJpaRepository.save(any(Comment.class))).thenReturn(null); // Simulasi gagal save
+        // Skenario 6: Gagal menyimpan komentar karena data kosong
+        // Setelah penambahan validasi @NotBlank (Perfective Action - Fase 3),
+        // server mengembalikan 400 Bad Request sebelum menyentuh service/database.
+        Comment newComment = new Comment(); // Data kosong — tidak punya user/comment
+        when(commentJpaRepository.save(any(Comment.class))).thenReturn(null);
 
         mockMvc.perform(post("/comment")
                .contentType(MediaType.APPLICATION_JSON)
                .content(objectMapper.writeValueAsString(newComment)))
-               .andExpect(status().isInternalServerError())
-               .andExpect(jsonPath("$.result").value(500));
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.result").value(400));
     }
 }

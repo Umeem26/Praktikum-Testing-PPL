@@ -115,7 +115,11 @@ public class PostControllerTest {
     @Test
     public void testModifyPostIntegration() throws Exception {
         // Skenario 9: Mengubah (Update) Post
+        // Catatan: Setelah Perfective Action Fase 3, field 'user' wajib diisi
+        // karena ada validasi @NotBlank. Constructor Post(id, title, content)
+        // tidak menyertakan user, sehingga perlu di-set manual.
         Post updateData = new Post(1L, "Judul Baru", "Isi Baru");
+        updateData.setUser("Hisyam"); // Wajib diisi agar lolos validasi @NotBlank
         when(jpaRepository.findOneById(1L)).thenReturn(updateData);
         when(jpaRepository.save(any(Post.class))).thenReturn(updateData);
 
