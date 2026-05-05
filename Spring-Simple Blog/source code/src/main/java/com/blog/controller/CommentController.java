@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.HtmlUtils; 
+import org.springframework.web.util.HtmlUtils;
 
 import com.blog.service.CommentService;
 import com.blog.vo.Comment;
@@ -25,9 +25,9 @@ public class CommentController {
 	
 	@PostMapping("/comment")
 	public Object savePost(HttpServletResponse response, @RequestBody Comment commentParam)  {		
-		// XSS Prevention: Mengubah tag HTML/Script menjadi plain text aman
-		String safeUser = HtmlUtils.htmlEscape(commentParam.getUser());
-		String safeCommentStr = HtmlUtils.htmlEscape(commentParam.getComment());
+		// XSS Prevention dengan Null Check
+		String safeUser = commentParam.getUser() == null ? null : HtmlUtils.htmlEscape(commentParam.getUser());
+		String safeCommentStr = commentParam.getComment() == null ? null : HtmlUtils.htmlEscape(commentParam.getComment());
 		
 		Comment comment = new Comment(commentParam.getPostId(), safeUser, safeCommentStr);
 		boolean isSuccess = commentService.saveComment(comment);
@@ -64,8 +64,8 @@ public class CommentController {
 	
 	@GetMapping("/comments/search")
 	public List<Comment> searchComments(@RequestParam("post_id") Long postId, @RequestParam("query") String query) {
-		// Validasi XSS pada query pencarian
-		String safeQuery = HtmlUtils.htmlEscape(query);
+		// Validasi XSS pada query pencarian dengan Null check
+		String safeQuery = query == null ? null : HtmlUtils.htmlEscape(query);
 		return commentService.searchCommentList(postId, safeQuery);
 	}
 }

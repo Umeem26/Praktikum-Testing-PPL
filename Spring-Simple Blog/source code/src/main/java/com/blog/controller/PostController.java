@@ -63,10 +63,10 @@ public class PostController {
 	
 	@PostMapping("/post")
 	public Object savePost(HttpServletResponse response, @RequestBody Post postParam)  {		
-		// XSS Prevention: Mengubah tag HTML/Script menjadi plain text aman
-		String safeUser = HtmlUtils.htmlEscape(postParam.getUser());
-		String safeTitle = HtmlUtils.htmlEscape(postParam.getTitle());
-		String safeContent = HtmlUtils.htmlEscape(postParam.getContent());
+		// XSS Prevention dengan Null Check
+		String safeUser = postParam.getUser() == null ? null : HtmlUtils.htmlEscape(postParam.getUser());
+		String safeTitle = postParam.getTitle() == null ? null : HtmlUtils.htmlEscape(postParam.getTitle());
+		String safeContent = postParam.getContent() == null ? null : HtmlUtils.htmlEscape(postParam.getContent());
 		
 		Post post = new Post(safeUser, safeTitle, safeContent);
 		boolean isSuccess = postService.savePost(post);
@@ -94,9 +94,9 @@ public class PostController {
 	
 	@PutMapping("/post")
 	public Object modifyPost(HttpServletResponse response, @RequestBody Post postParam)  {		
-		// XSS Prevention: Mengubah tag HTML/Script menjadi plain text aman
-		String safeTitle = HtmlUtils.htmlEscape(postParam.getTitle());
-		String safeContent = HtmlUtils.htmlEscape(postParam.getContent());
+		// XSS Prevention dengan Null Check
+		String safeTitle = postParam.getTitle() == null ? null : HtmlUtils.htmlEscape(postParam.getTitle());
+		String safeContent = postParam.getContent() == null ? null : HtmlUtils.htmlEscape(postParam.getContent());
 		
 		Post post = new Post(postParam.getId(), safeTitle, safeContent);
 		boolean isSuccess = postService.updatePost(post);
