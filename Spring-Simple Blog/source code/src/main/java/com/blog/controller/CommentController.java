@@ -15,16 +15,21 @@ import org.springframework.web.util.HtmlUtils;
 
 import com.blog.service.CommentService;
 import com.blog.vo.Comment;
+import com.blog.vo.CommentRequest;
 import com.blog.vo.Result;
 
 @RestController
 public class CommentController {
 
+	private final CommentService commentService;
+
 	@Autowired
-	CommentService commentService;
+	public CommentController(CommentService commentService) {
+		this.commentService = commentService;
+	}
 	
 	@PostMapping("/comment")
-	public Object savePost(HttpServletResponse response, @RequestBody Comment commentParam)  {		
+	public Object savePost(HttpServletResponse response, @RequestBody CommentRequest commentParam)  {		
 		// XSS Prevention dengan Null Check
 		String safeUser = commentParam.getUser() == null ? null : HtmlUtils.htmlEscape(commentParam.getUser());
 		String safeCommentStr = commentParam.getComment() == null ? null : HtmlUtils.htmlEscape(commentParam.getComment());

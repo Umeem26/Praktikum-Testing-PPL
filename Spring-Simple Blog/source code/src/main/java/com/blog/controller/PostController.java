@@ -18,14 +18,19 @@ import org.springframework.web.util.HtmlUtils; // Tambahan Import untuk XSS Prot
 
 import com.blog.service.PostService;
 import com.blog.vo.Post;
+import com.blog.vo.PostRequest;
 import com.blog.vo.Result;
 
 @RestController
 public class PostController {
 	Logger log = LoggerFactory.getLogger(this.getClass());
 	
+	private final PostService postService;
+
 	@Autowired
-	PostService postService;
+	public PostController(PostService postService) {
+		this.postService = postService;
+	}
 	
 	@GetMapping("/post")
 	public Post getPost(@RequestParam("id") Long id) {
@@ -62,7 +67,7 @@ public class PostController {
 	}
 	
 	@PostMapping("/post")
-	public Object savePost(HttpServletResponse response, @RequestBody Post postParam)  {		
+	public Object savePost(HttpServletResponse response, @RequestBody PostRequest postParam)  {	
 		// XSS Prevention dengan Null Check
 		String safeUser = postParam.getUser() == null ? null : HtmlUtils.htmlEscape(postParam.getUser());
 		String safeTitle = postParam.getTitle() == null ? null : HtmlUtils.htmlEscape(postParam.getTitle());
@@ -93,7 +98,7 @@ public class PostController {
 	}
 	
 	@PutMapping("/post")
-	public Object modifyPost(HttpServletResponse response, @RequestBody Post postParam)  {		
+	public Object modifyPost(HttpServletResponse response, @RequestBody PostRequest postParam)  {		
 		// XSS Prevention dengan Null Check
 		String safeTitle = postParam.getTitle() == null ? null : HtmlUtils.htmlEscape(postParam.getTitle());
 		String safeContent = postParam.getContent() == null ? null : HtmlUtils.htmlEscape(postParam.getContent());
