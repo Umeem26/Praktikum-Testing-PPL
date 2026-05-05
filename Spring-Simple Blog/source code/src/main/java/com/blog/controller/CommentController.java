@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,9 +27,12 @@ import com.blog.vo.Result;
 @RestController
 public class CommentController {
 
-	@Autowired
-	CommentService commentService;
-	
+	private final CommentService commentService;
+
+	public CommentController(CommentService commentService) {
+		this.commentService = commentService;
+	}
+
 	@PostMapping("/comment")
 	public Object savePost(HttpServletResponse response, @Valid @RequestBody CommentRequest commentParam)  {		
 		// XSS Prevention: Mengubah tag HTML/Script menjadi plain text aman

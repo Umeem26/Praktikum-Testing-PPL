@@ -1,16 +1,22 @@
 package com.blog.vo;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "post")
+@Table(name = "post", indexes = {
+    @Index(name = "idx_post_updt_date", columnList = "updtDate"),
+    @Index(name = "idx_post_reg_date", columnList = "regDate")
+})
 public class Post {
 
     @Id
@@ -27,11 +33,13 @@ public class Post {
     @Column(name="content")
 	private String content;
     
+    @JsonFormat(pattern = "dd MMMM yyyy HH:mm", timezone = "Asia/Jakarta")
     @Column(name="regDate")
-	private Date regDate;
+	private LocalDateTime regDate;
     
+    @JsonFormat(pattern = "dd MMMM yyyy HH:mm", timezone = "Asia/Jakarta")
     @Column(name="updtDate")
-	private Date updtDate;
+	private LocalDateTime updtDate;
 
 	public Post() {
 	}
@@ -40,8 +48,8 @@ public class Post {
 		this.user = user;
 		this.title = title;
 		this.content = content;
-		this.regDate = new Date();
-		this.updtDate = new Date();
+		this.regDate = LocalDateTime.now();
+		this.updtDate = LocalDateTime.now();
 	}
 
 	public Post(Long id, String user, String title, String content) {
@@ -50,8 +58,8 @@ public class Post {
 		this.user = user;
 		this.title = title;
 		this.content = content;
-		this.regDate = new Date();
-		this.updtDate = new Date();
+		this.regDate = LocalDateTime.now();
+		this.updtDate = LocalDateTime.now();
 	}
 
 	public Post(Long id, String title, String content) {
@@ -93,19 +101,19 @@ public class Post {
 		this.content = content;
 	}
 
-	public Date getRegDate() {
+	public LocalDateTime getRegDate() {
 		return regDate;
 	}
 
-	public void setRegDate(Date regDate) {
+	public void setRegDate(LocalDateTime regDate) {
 		this.regDate = regDate;
 	}
 
-	public Date getUpdtDate() {
+	public LocalDateTime getUpdtDate() {
 		return updtDate;
 	}
 
-	public void setUpdtDate(Date updtDate) {
+	public void setUpdtDate(LocalDateTime updtDate) {
 		this.updtDate = updtDate;
 	}
 

@@ -2,7 +2,6 @@ package com.blog.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.blog.repository.CommentJpaRepository;
@@ -11,18 +10,14 @@ import com.blog.vo.Comment;
 @Service
 public class CommentService {
 
-	@Autowired
-	CommentJpaRepository commentJpaRepository;
+	private final CommentJpaRepository commentJpaRepository;
+
+	public CommentService(CommentJpaRepository commentJpaRepository) {
+		this.commentJpaRepository = commentJpaRepository;
+	}
 	
-	public boolean  saveComment(Comment comment) {
-		Comment result = commentJpaRepository.save(comment);
-		boolean isSuccess = true;
-		
-		if(result == null) {
-			isSuccess = false;
-		}
-		
-		return isSuccess;
+	public boolean saveComment(Comment comment) {
+		return commentJpaRepository.save(comment) != null;
 	}
 
 	public List<Comment> getCommentList(Long postId) {

@@ -2,7 +2,6 @@ package com.blog.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -13,11 +12,13 @@ import com.blog.vo.Post;
 @Service
 public class PostService {
 
-	@Autowired
-	PostRepository postRepository;
-	
-	@Autowired
-	PostJpaRepository jpaRepository;
+	private final PostRepository postRepository;
+	private final PostJpaRepository jpaRepository;
+
+	public PostService(PostRepository postRepository, PostJpaRepository jpaRepository) {
+		this.postRepository = postRepository;
+		this.jpaRepository = jpaRepository;
+	}
 
 	public Post getPost(Long id) {
 		Post post = jpaRepository.findOneById(id);
@@ -50,15 +51,8 @@ public class PostService {
 		return posts;
 	}
 	
-	public boolean  savePost(Post post) {
-		Post result = jpaRepository.save(post);
-		boolean isSuccess = true;
-		
-		if(result == null) {
-			isSuccess = false;
-		}
-		
-		return isSuccess;
+	public boolean savePost(Post post) {
+		return jpaRepository.save(post) != null;
 	}
 	
 	public boolean deletePost(Long id) {

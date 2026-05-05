@@ -11,13 +11,11 @@ import javax.validation.constraints.Size;
  * 2. Memisahkan tanggung jawab: DTO untuk input, Entity untuk persistensi.
  * 3. Menghilangkan peringatan SonarQube "Replace persistent entity with POJO/DTO".
  */
-public class PostRequest {
+public class PostRequest extends BaseUserRequest {
 
     private Long id;
 
-    @NotBlank(message = "User name tidak boleh kosong")
-    @Size(max = 50, message = "User name maksimal 50 karakter")
-    private String user;
+
 
     @NotBlank(message = "Judul post tidak boleh kosong")
     @Size(max = 200, message = "Judul maksimal 200 karakter")
@@ -27,6 +25,7 @@ public class PostRequest {
     private String content;
 
     public PostRequest() {
+        // Default constructor required by Jackson for JSON deserialization
     }
 
     public Long getId() {
@@ -37,13 +36,7 @@ public class PostRequest {
         this.id = id;
     }
 
-    public String getUser() {
-        return user;
-    }
 
-    public void setUser(String user) {
-        this.user = user;
-    }
 
     public String getTitle() {
         return title;

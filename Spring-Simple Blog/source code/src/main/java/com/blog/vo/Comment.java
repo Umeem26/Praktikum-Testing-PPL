@@ -1,16 +1,21 @@
 package com.blog.vo;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "comment")
+@Table(name = "comment", indexes = {
+    @Index(name = "idx_comment_post_id", columnList = "postId")
+})
 public class Comment {
 
 	@Id
@@ -27,8 +32,9 @@ public class Comment {
     @Column(name="comment")
 	private String comment;
     
+    @JsonFormat(pattern = "dd MMMM yyyy HH:mm", timezone = "Asia/Jakarta")
     @Column(name="regDate")
-	private Date regDate;
+	private LocalDateTime regDate;
 
 	public Comment() {
 	}
@@ -37,7 +43,7 @@ public class Comment {
 		this.postId = postId;
 		this.user = user;
 		this.comment = comment;
-		this.regDate = new Date();
+		this.regDate = LocalDateTime.now();
 	}
 
 	public Long getId() {
@@ -72,11 +78,11 @@ public class Comment {
 		this.comment = comment;
 	}
 
-	public Date getRegDate() {
+	public LocalDateTime getRegDate() {
 		return regDate;
 	}
 
-	public void setRegDate(Date regDate) {
+	public void setRegDate(LocalDateTime regDate) {
 		this.regDate = regDate;
 	}
 }

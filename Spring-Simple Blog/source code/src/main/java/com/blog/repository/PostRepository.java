@@ -2,7 +2,6 @@ package com.blog.repository;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -13,8 +12,11 @@ import com.blog.vo.Post;
 @Repository
 public class PostRepository {
 	
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private final JdbcTemplate jdbcTemplate;
+
+	public PostRepository(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 	
 	public Post findById(Long id) {
 		String sql = "SELECT * FROM post WHERE id = ?";
