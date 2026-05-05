@@ -1,20 +1,27 @@
 package com.blog.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.HtmlUtils; // Tambahan Import untuk XSS Protection
+import org.springframework.web.util.HtmlUtils;
 
 import com.blog.service.PostService;
 import com.blog.vo.Post;
@@ -62,7 +69,7 @@ public class PostController {
 	}
 	
 	@PostMapping("/post")
-	public Object savePost(HttpServletResponse response, @RequestBody Post postParam)  {		
+	public Object savePost(HttpServletResponse response, @Valid @RequestBody Post postParam)  {		
 		// XSS Prevention: Mengubah tag HTML/Script menjadi plain text aman
 		String safeUser = HtmlUtils.htmlEscape(postParam.getUser());
 		String safeTitle = HtmlUtils.htmlEscape(postParam.getTitle());
@@ -93,7 +100,7 @@ public class PostController {
 	}
 	
 	@PutMapping("/post")
-	public Object modifyPost(HttpServletResponse response, @RequestBody Post postParam)  {		
+	public Object modifyPost(HttpServletResponse response, @Valid @RequestBody Post postParam)  {		
 		// XSS Prevention: Mengubah tag HTML/Script menjadi plain text aman
 		String safeTitle = HtmlUtils.htmlEscape(postParam.getTitle());
 		String safeContent = HtmlUtils.htmlEscape(postParam.getContent());
@@ -107,5 +114,20 @@ public class PostController {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return new Result(500, "Fail");
 		}
+	}
+
+	/**
+	 * Handler untuk menangkap error validasi @NotBlank / @Size.
+	 * Jika field wajib kosong, server mengembalikan HTTP 400 Bad Request
+	 * beserta daftar pesan error yang deskriptif.
+	 */
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public Result handleValidationException(MethodArgumentNotValidException ex) {
+		String errorMessages = ex.getBindingResult().getFieldErrors()
+			.stream()
+			.map(FieldError::getDefaultMessage)
+			.collect(Collectors.joining(", "));
+		return new Result(400, "Validasi gagal: " + errorMessages);
 	}
 }

@@ -1,17 +1,24 @@
 package com.blog.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.HtmlUtils; 
+import org.springframework.web.util.HtmlUtils;
 
 import com.blog.service.CommentService;
 import com.blog.vo.Comment;
@@ -24,7 +31,7 @@ public class CommentController {
 	CommentService commentService;
 	
 	@PostMapping("/comment")
-	public Object savePost(HttpServletResponse response, @RequestBody Comment commentParam)  {		
+	public Object savePost(HttpServletResponse response, @Valid @RequestBody Comment commentParam)  {		
 		// XSS Prevention: Mengubah tag HTML/Script menjadi plain text aman
 		String safeUser = HtmlUtils.htmlEscape(commentParam.getUser());
 		String safeCommentStr = HtmlUtils.htmlEscape(commentParam.getComment());
@@ -67,5 +74,19 @@ public class CommentController {
 		// Validasi XSS pada query pencarian
 		String safeQuery = HtmlUtils.htmlEscape(query);
 		return commentService.searchCommentList(postId, safeQuery);
+	}
+
+	/**
+	 * Handler untuk menangkap error validasi @NotBlank / @NotNull.
+	 * Jika komentar atau user kosong, server mengembalikan HTTP 400 Bad Request.
+	 */
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public Result handleValidationException(MethodArgumentNotValidException ex) {
+		String errorMessages = ex.getBindingResult().getFieldErrors()
+			.stream()
+			.map(FieldError::getDefaultMessage)
+			.collect(Collectors.joining(", "));
+		return new Result(400, "Validasi gagal: " + errorMessages);
 	}
 }
