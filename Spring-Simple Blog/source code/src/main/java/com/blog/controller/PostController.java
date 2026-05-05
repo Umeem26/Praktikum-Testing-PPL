@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 
+import com.blog.dto.PostRequest;
 import com.blog.service.PostService;
 import com.blog.vo.Post;
 import com.blog.vo.Result;
@@ -69,7 +70,7 @@ public class PostController {
 	}
 	
 	@PostMapping("/post")
-	public Object savePost(HttpServletResponse response, @Valid @RequestBody Post postParam)  {		
+	public Object savePost(HttpServletResponse response, @Valid @RequestBody PostRequest postParam)  {		
 		// XSS Prevention: Mengubah tag HTML/Script menjadi plain text aman
 		String safeUser = HtmlUtils.htmlEscape(postParam.getUser());
 		String safeTitle = HtmlUtils.htmlEscape(postParam.getTitle());
@@ -100,7 +101,7 @@ public class PostController {
 	}
 	
 	@PutMapping("/post")
-	public Object modifyPost(HttpServletResponse response, @Valid @RequestBody Post postParam)  {		
+	public Object modifyPost(HttpServletResponse response, @Valid @RequestBody PostRequest postParam)  {		
 		// XSS Prevention: Mengubah tag HTML/Script menjadi plain text aman
 		String safeTitle = HtmlUtils.htmlEscape(postParam.getTitle());
 		String safeContent = HtmlUtils.htmlEscape(postParam.getContent());

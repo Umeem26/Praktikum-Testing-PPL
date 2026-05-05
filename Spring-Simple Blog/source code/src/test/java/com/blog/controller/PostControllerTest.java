@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.blog.dto.PostRequest;
 import com.blog.repository.PostJpaRepository;
 import com.blog.vo.Post;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,12 +59,18 @@ public class PostControllerTest {
     @Test
     public void testSavePostIntegration() throws Exception {
         // Skenario 3: Integrasi Controller + Service untuk menyimpan Post baru
-        Post newPost = new Post("Hisyam", "Judul Baru", "Isi Baru");
-        when(jpaRepository.save(any(Post.class))).thenReturn(newPost);
+        // Menggunakan PostRequest DTO (bukan entity Post langsung) sesuai perubahan controller
+        PostRequest newPostReq = new PostRequest();
+        newPostReq.setUser("Hisyam");
+        newPostReq.setTitle("Judul Baru");
+        newPostReq.setContent("Isi Baru");
+
+        Post savedPost = new Post("Hisyam", "Judul Baru", "Isi Baru");
+        when(jpaRepository.save(any(Post.class))).thenReturn(savedPost);
 
         mockMvc.perform(post("/post")
                .contentType(MediaType.APPLICATION_JSON)
-               .content(objectMapper.writeValueAsString(newPost)))
+               .content(objectMapper.writeValueAsString(newPostReq)))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.result").value(200));
     }
@@ -115,17 +122,20 @@ public class PostControllerTest {
     @Test
     public void testModifyPostIntegration() throws Exception {
         // Skenario 9: Mengubah (Update) Post
-        // Catatan: Setelah Perfective Action Fase 3, field 'user' wajib diisi
-        // karena ada validasi @NotBlank. Constructor Post(id, title, content)
-        // tidak menyertakan user, sehingga perlu di-set manual.
-        Post updateData = new Post(1L, "Judul Baru", "Isi Baru");
-        updateData.setUser("Hisyam"); // Wajib diisi agar lolos validasi @NotBlank
-        when(jpaRepository.findOneById(1L)).thenReturn(updateData);
-        when(jpaRepository.save(any(Post.class))).thenReturn(updateData);
+        // Menggunakan PostRequest DTO sesuai perubahan controller (Perfective Action Fase 3)
+        PostRequest updateReq = new PostRequest();
+        updateReq.setId(1L);
+        updateReq.setUser("Hisyam");
+        updateReq.setTitle("Judul Baru");
+        updateReq.setContent("Isi Baru");
+
+        Post existingPost = new Post(1L, "Hisyam", "Judul Baru", "Isi Baru");
+        when(jpaRepository.findOneById(1L)).thenReturn(existingPost);
+        when(jpaRepository.save(any(Post.class))).thenReturn(existingPost);
 
         mockMvc.perform(put("/post")
                .contentType(MediaType.APPLICATION_JSON)
-               .content(objectMapper.writeValueAsString(updateData)))
+               .content(objectMapper.writeValueAsString(updateReq)))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.result").value(200));
     }

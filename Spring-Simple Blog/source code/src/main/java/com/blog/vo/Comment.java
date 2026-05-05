@@ -8,9 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "comment")
@@ -21,16 +18,12 @@ public class Comment {
     @Column(name="id")
 	private Long id;
 	
-	@NotNull(message = "Post ID tidak boleh kosong")
 	@Column(name="postId")
 	private Long postId;
     
-    @NotBlank(message = "Nama user tidak boleh kosong")
-    @Size(max = 50, message = "Nama user maksimal 50 karakter")
     @Column(name="user")
 	private String user;
     
-    @NotBlank(message = "Komentar tidak boleh kosong")
     @Column(name="comment")
 	private String comment;
     

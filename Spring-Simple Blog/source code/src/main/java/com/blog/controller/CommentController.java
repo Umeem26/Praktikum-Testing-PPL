@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 
+import com.blog.dto.CommentRequest;
 import com.blog.service.CommentService;
 import com.blog.vo.Comment;
 import com.blog.vo.Result;
@@ -31,7 +32,7 @@ public class CommentController {
 	CommentService commentService;
 	
 	@PostMapping("/comment")
-	public Object savePost(HttpServletResponse response, @Valid @RequestBody Comment commentParam)  {		
+	public Object savePost(HttpServletResponse response, @Valid @RequestBody CommentRequest commentParam)  {		
 		// XSS Prevention: Mengubah tag HTML/Script menjadi plain text aman
 		String safeUser = HtmlUtils.htmlEscape(commentParam.getUser());
 		String safeCommentStr = HtmlUtils.htmlEscape(commentParam.getComment());

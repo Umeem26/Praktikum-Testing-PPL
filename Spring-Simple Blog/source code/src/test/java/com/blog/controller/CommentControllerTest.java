@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.blog.dto.CommentRequest;
 import com.blog.repository.CommentJpaRepository;
 import com.blog.vo.Comment;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -57,12 +58,18 @@ public class CommentControllerTest {
     @Test
     public void testSaveCommentIntegration() throws Exception {
         // Skenario 3: Menyimpan komentar baru
-        Comment newComment = new Comment(1L, "Hisyam", "Komentar Baru");
-        when(commentJpaRepository.save(any(Comment.class))).thenReturn(newComment);
+        // Menggunakan CommentRequest DTO sesuai perubahan controller (Perfective Action Fase 3)
+        CommentRequest newCommentReq = new CommentRequest();
+        newCommentReq.setPostId(1L);
+        newCommentReq.setUser("Hisyam");
+        newCommentReq.setComment("Komentar Baru");
+
+        Comment savedComment = new Comment(1L, "Hisyam", "Komentar Baru");
+        when(commentJpaRepository.save(any(Comment.class))).thenReturn(savedComment);
 
         mockMvc.perform(post("/comment")
                .contentType(MediaType.APPLICATION_JSON)
-               .content(objectMapper.writeValueAsString(newComment)))
+               .content(objectMapper.writeValueAsString(newCommentReq)))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.result").value(200));
     }
@@ -95,14 +102,14 @@ public class CommentControllerTest {
     @Test
     public void testSaveCommentFailIntegration() throws Exception {
         // Skenario 6: Gagal menyimpan komentar karena data kosong
-        // Setelah penambahan validasi @NotBlank (Perfective Action - Fase 3),
+        // Setelah penambahan validasi @NotBlank pada CommentRequest (Perfective Action - Fase 3),
         // server mengembalikan 400 Bad Request sebelum menyentuh service/database.
-        Comment newComment = new Comment(); // Data kosong — tidak punya user/comment
+        CommentRequest emptyReq = new CommentRequest(); // Data kosong — tidak punya user/comment
         when(commentJpaRepository.save(any(Comment.class))).thenReturn(null);
 
         mockMvc.perform(post("/comment")
                .contentType(MediaType.APPLICATION_JSON)
-               .content(objectMapper.writeValueAsString(newComment)))
+               .content(objectMapper.writeValueAsString(emptyReq)))
                .andExpect(status().isBadRequest())
                .andExpect(jsonPath("$.result").value(400));
     }
